@@ -1,0 +1,38 @@
+<div class="center loading" *ngIf="type==='LOADING'" style="text-align:center">
+    <mat-spinner></mat-spinner>
+</div>
+
+<div class="center" *ngIf="type==='ALERT'">
+    <img src="assets/imgs/alert.png" class="icon">
+    <h1 mat-dialog-title class="c_font">{{title}}</h1>
+    <div mat-dialog-content class="c_font">
+        {{message}}
+    </div>
+
+    <div style="padding-top:20px">
+        <button mat-stroked-button mat-dialog-close color="warn" (click)="close('N')" class="full-btn">{{'DISMISS' |
+            translate}}</button>
+    </div>
+</div>
+
+
+<div class="center" *ngIf="type==='CNF_ALERT'">
+    <img src="assets/imgs/alert.png" class="icon">
+    <h1 mat-dialog-title class="c_font">{{title}}</h1>
+    <div mat-dialog-content class="c_font">
+        {{message}}
+    </div>
+
+    <div style="padding-top:20px">
+        <mat-grid-list cols="2" rowHeight="40px">
+            <mat-grid-tile>
+                <button mat-stroked-button mat-dialog-close color="warn" (click)="close('N')"
+                    class="full-btn">{{'DISMISS' | translate}}</button>
+            </mat-grid-tile>
+            <mat-grid-tile>
+                <button mat-flat-button mat-dialog-close color="primary" (click)="close('Y')"
+                    class="full-btn">{{'PROCEED' | translate}}</button>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </div>
+</div>

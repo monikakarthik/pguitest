@@ -1,0 +1,30 @@
+
+$secondary: #919191; // #F57C00;
+.center {
+    width: 100%;
+    text-align: center;
+}
+.icon {
+    height: 60px;
+}
+
+.toolbar-spacer {
+    flex: 1 1 auto;
+}
+
+.full-btn{
+    width: 95%;
+    font-family: 'Courier New', Courier, monospace !important;
+}
+.ib_font {
+    font-family: 'Courier New', Courier, monospace;
+    color: #512DA8;
+}
+.otp-field {
+    width: 90%;
+    font-family: 'Courier New', Courier, monospace;
+    color: #512DA8;
+}
+mat-form-field {
+    border:0px none !important; 
+}

@@ -1,0 +1,43 @@
+
+$secondary: #919191; // #F57C00;
+.center {
+    width: 100%;
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+.icon {
+    height: 60px;
+}
+
+.toolbar-spacer {
+    flex: 1 1 auto;
+}
+
+.full-btn {
+    width: 95%;
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
+.label {
+    font-family: 'Courier New', Courier, monospace;
+    color: $secondary;
+    font-size: smaller !important;
+}
+.ib_font {
+    font-family: 'Courier New', Courier, monospace;
+    color: #512DA8;
+}
+
+.icon-button {
+    background: none;
+    padding: 5px;
+    border: 0;
+    cursor: pointer;
+    height: 50px !important;
+    width:50px !important;
+}
+
+.icon-button .icon {
+    width: 50px;
+    height: 50px;
+}

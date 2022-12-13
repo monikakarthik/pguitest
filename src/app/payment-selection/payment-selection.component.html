@@ -1,0 +1,403 @@
+<!-- <mat-toolbar color="primary" class="header">
+  <mat-toolbar-row>
+    <img [src]="global.getImagePath('logo.png')" class="bank-logo">
+    <span class="toolbar-spacer"></span>
+    <img [src]="global.getImagePath('ib-logo.png')" class="merchant-logo" *ngIf="!global.merchantLogo">
+    <img [src]="global.merchantLogo" class="merchant-logo" *ngIf="global.merchantLogo">
+  </mat-toolbar-row>
+</mat-toolbar> -->
+<div class="content" *ngIf="pageStatus==1">
+  <div id="container" class="ion-padding">
+    <div>
+      <div class="mesh-loader">
+        <div class="set-one">
+          <div class="circle"></div>
+          <div class="circle"></div>
+        </div>
+        <div class="set-two">
+          <div class="circle"></div>
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content payment-selection" *ngIf="pageStatus==2">
+  <div class="payment-container">
+    <table mat-table class="mat-elevation-z5">
+      <td mat-cell>
+        <mat-card class="payment-box">
+          <mat-list class="no-margin no-padding">
+            <mat-list-item class="no-margin no-padding payment-header">
+              <div mat-line class="c_font bold secondary">{{'PAYMENT_METHOD' | translate}}</div>
+              <mat-icon matSuffix (click)="changeSelectedLanguage()">
+                <img [src]="languageFlag">
+              </mat-icon>
+            </mat-list-item>
+          </mat-list>
+          <mat-card-content>
+            <mat-tab-group mat-align-tabs="start" (selectedTabChange)="clearForm()">
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <img [src]="global.getImagePath('icons/wallet-dark.png')" class="tab-icon">
+                </ng-template>
+                <div class="tab-desc">
+                  {{'WALLET_PAYMENT' | translate}}
+                </div>
+                <div class="amount-payable">
+                  {{'AMOUNT_PAYABLE' | translate}}: {{global.formatAmount(txnAmount)}}
+                  {{global.getCurrencyText(txnCurrency)}}
+                </div>
+                <mat-card class="no-shadow card-btn" type="button" (click)="showWalletSelectionScreen()">
+                  <mat-card-header>
+                    <div mat-card-avatar><img [src]="getWalletLogo(walletType)" class="card-avatar"></div>
+                    <mat-card-subtitle style="padding:0px;margin:0px">
+                      <p class="label">{{'WALLET_TYPE' | translate}}</p>
+                      <p class="value">{{getWalletDescription(walletType)}}</p>
+                      <button mat-icon-button class="right-btn">
+                        <mat-icon color="primary">expand_more</mat-icon>
+                      </button>
+                    </mat-card-subtitle>
+                  </mat-card-header>
+                </mat-card>
+                <form (ngSubmit)="validateWalletPay()">
+                  <mat-form-field class="card-input-fields">
+                    <mat-label class="label">{{'MOBILE_NUM' | translate}}</mat-label>
+                    <input matInput type="tel" maxlength="10" placeholder="20XXXXXXXX" [(ngModel)]="mobileNumber"
+                      name="mobile" class="value" appBlockCopyPaste numbersOnly>
+                  </mat-form-field>
+                  <br>
+                  <button mat-flat-button color="primary" class="btn" type="submit"
+                    [disabled]="!mobileNumber || mobileNumber.length<8">
+                    {{'PROCEED' | translate}}
+                  </button>
+                  <br>
+                </form>
+                <div class="cancel-btn">
+                  <button mat-stroked-button color="warn" class="cancel" (click)="cancelPayment()">{{'CANCEL_PAYMENT' |
+                    translate}}</button>
+                </div>
+                <br>
+              </mat-tab>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <img [src]="global.getImagePath('icons/card-dark.png')" class="tab-icon">
+                </ng-template>
+                <div class="tab-desc">
+                  {{'CARD_PAYMENT' | translate}}
+                </div>
+                <div class="amount-payable">
+                  {{'AMOUNT_PAYABLE' | translate}}: {{global.formatAmount(txnAmount)}}
+                  {{global.getCurrencyText(txnCurrency)}}
+                </div>
+                <form [formGroup]="cardPaymentForm" (ngSubmit)="validateCardForm()" novalidate>
+                  <div class="card-form">
+                    <mat-form-field class="card-input-fields">
+                      <mat-label class="label">{{'CARD_NUMBER' | translate}}</mat-label>
+                      <input matInput maxlength="19" formControlName="cardNumber" type="tel" #ccNumber
+                        placeholder="XXXX XXXX XXXX XXXX"  (keyup)="creditCardNumberSpacing()" class="card-input-box"
+                        autocomplete="off" autofocus class="value" appBlockCopyPaste >
+
+                      <mat-icon matSuffix class="card-icon">
+                        <img [src]="getCardImage()" style="height:25pt;width:30pt">
+                      </mat-icon>
+                      <mat-error
+                        *ngIf="!cardPaymentForm.controls['cardNumber'].valid && cardPaymentForm.controls['cardNumber'].touched">
+                        {{ getErrorCard() }}
+                      </mat-error>
+                    </mat-form-field>
+                    <mat-form-field class="card-input-fields">
+                      <mat-label class="label">{{'CARD_HOLDER_NAME' | translate}}</mat-label>
+                      <input matInput type="text" maxlength="50" placeholder="{{'CARD_HOLDER_NAME' | translate}}"
+                        formControlName="cardHolderName" autocomplete="off" class="value" appBlockCopyPaste>
+                      <mat-error
+                        *ngIf="!cardPaymentForm.controls['cardHolderName'].valid && cardPaymentForm.controls['cardHolderName'].touched">
+                        {{ getErrorCardName() }}
+                      </mat-error>
+                    </mat-form-field>
+                    <mat-grid-list cols="2" rowHeight="60px">
+                      <mat-grid-tile>
+                        <mat-form-field class="card-input-fields">
+                          <mat-label class="label">{{'CARD_EXPIRY' | translate}}(MM/YY)</mat-label>
+                          <input matInput type="text" pattern="([0-9]{2}[/]?){2}" formControlName="cardExpiry"
+                            autocomplete="off" placeholder="MM/YY" class="value" maxlength="5"
+                            (keyup)="formatCardExpiry($event)" appBlockCopyPaste />
+                          <mat-error
+                            *ngIf="!cardPaymentForm.controls['cardExpiry'].valid && cardPaymentForm.controls['cardExpiry'].touched">
+                            {{ getErrorCardExpiry() }}
+                          </mat-error>
+                        </mat-form-field>
+                      </mat-grid-tile>
+                      <mat-grid-tile>
+                        <mat-form-field class="card-input-fields" style="padding-left:8px">
+                          <mat-label class="label">{{'CARD_CVV' | translate}}</mat-label>
+                          <input matInput type="tel" formControlName="cardCvv" autocomplete="off" placeholder="XXX"
+                            class="value" maxlength="3" appBlockCopyPaste numbersOnly/>
+                          <mat-icon color="primary" matSuffix style="margin-right:8px">info</mat-icon>
+                          <mat-error
+                            *ngIf="!cardPaymentForm.controls['cardCvv'].valid && cardPaymentForm.controls['cardCvv'].touched">
+                            {{ getErrorCardCvv() }}
+                          </mat-error>
+                        </mat-form-field>
+                      </mat-grid-tile>
+                    </mat-grid-list>
+                  </div>
+                  <br>
+                  <button mat-flat-button color="primary" class="btn" [disabled]="!validCardDetails()">
+                    {{'PROCEED' | translate}}
+                  </button>
+                </form>
+                <div class="cancel-btn">
+                  <button mat-stroked-button color="warn" class="cancel" (click)="cancelPayment()">{{'CANCEL_PAYMENT' |
+                    translate}}</button>
+                </div>
+              </mat-tab>
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <img [src]="global.getImagePath('icons/account-dark.png')" class="tab-icon">
+                </ng-template>
+                <div class="tab-desc">
+                  {{'ACCOUNT_PAYMENT' | translate}}
+                </div>
+                <div class="amount-payable">
+                  {{'AMOUNT_PAYABLE' | translate}}: {{global.formatAmount(txnAmount)}}
+                  {{global.getCurrencyText(txnCurrency)}}
+                </div>
+                <!-- Surya anna added this on account type -->
+                <!-- <mat-card class="no-shadow card-btn">
+
+                  
+                  <mat-card-header>
+                    <div mat-card-avatar><img [src]="getWalletLogo('ib')" class="card-avatar"></div>
+                    <mat-card-subtitle>
+                      <p style="padding-top:10px" class="primary c_font">{{getWalletDescription(walletType)}}</p>
+                      <button mat-icon-button class="right-btn">
+                        <mat-icon color="primary">expand_more</mat-icon>
+                      </button>
+                    </mat-card-subtitle>
+                  </mat-card-header>
+                </mat-card> -->
+                <form (ngSubmit)="validateAccountPayFields()">
+                  <mat-form-field class="card-input-fields">
+                    <mat-label class="label">{{'ACCOUNT_NUM' | translate}}</mat-label>
+                    <input matInput type="tel" maxlength="16" placeholder="XXXXXXXXXXXXXXXX"
+                      [(ngModel)]="accountDetails.accountNo" name="accountNo" class="value" appBlockCopyPaste numbersOnly>
+                  </mat-form-field>
+                  <br>
+                  <mat-form-field class="dob-box">
+                    <mat-label class="label">{{'DOB' | translate}} (MM/DD/YYYY)</mat-label>
+                    <input matInput [matDatepicker]="datepicker" [(ngModel)]="accountDetails.dob" name="dob" appBlockCopyPaste numbersOnly> 
+                    <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+                    <mat-datepicker #datepicker>
+                      <mat-datepicker-actions>
+                        <button mat-button matDatepickerCancel>{{'CANCEL' | translate}}</button>
+                        <button mat-raised-button color="primary" matDatepickerApply>{{'SELECT' | translate}}</button>
+                      </mat-datepicker-actions>
+                    </mat-datepicker>
+                  </mat-form-field>
+                  <br>
+                  <button mat-flat-button color="primary" class="btn"
+                    [disabled]="!(accountDetails.accountNo && accountDetails.dob) ||(accountDetails.accountNo.length<8)">
+                    {{'PROCEED' | translate}}
+                  </button>
+                </form>
+                <br>
+                <div class="cancel-btn">
+                  <button mat-stroked-button color="warn" class="cancel" (click)="cancelPayment()">
+                    {{'CANCEL_PAYMENT' | translate}}</button>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+      </td>
+      <td mat-cell class="mat-cell">
+        <mat-card class="purchase-summary">
+          <mat-list class="no-margin no-padding">
+            <mat-list-item class="no-margin no-padding payment-header">
+              <div mat-line class="c_font bold secondary">{{'PAYMENT_SUMMARY' | translate}}</div>
+            </mat-list-item>
+          </mat-list>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item>
+                <div style="display:flex; flex-direction:column">
+                  <p class="label">{{'REF_NO' | translate}}</p>
+                  <p class="value">{{merchantRefNumber}}</p>
+                </div>
+              </mat-list-item>
+              <mat-divider></mat-divider>
+              <mat-list-item>
+                <div style="display:flex; flex-direction:column">
+                  <p matLine class="label">{{'SUB_TOTAL' | translate}} </p>
+                  <p matLine class="value"> {{global.formatAmount(txnAmount)}} {{global.getCurrencyText(txnCurrency)}}
+                  </p>
+                </div>
+              </mat-list-item>
+              <mat-divider></mat-divider>
+              <mat-list-item>
+                <div style="display:flex; flex-direction:column">
+                  <p matLine class="label">{{'SERVICE_FEE' | translate}} </p>
+                  <p matLine class="value"> {{global.formatAmount(txnFee)}} {{global.getCurrencyText(txnCurrency)}} </p>
+                </div>
+              </mat-list-item>
+              <mat-divider></mat-divider>
+              <mat-list-item>
+                <div style="display:flex; flex-direction:column">
+                  <p matLine class="label">{{'SERVICE_TAX' | translate}} </p>
+                  <p matLine class="value"> {{global.formatAmount(serviceTax)}} {{global.getCurrencyText(txnCurrency)}}
+                  </p>
+                </div>
+              </mat-list-item>
+            </mat-list>
+            <div class="total-amt-field">
+              <div class="total-amt-box">
+                {{'TOTAL_AMT' | translate}}: {{getTotalAmount()}} {{global.getCurrencyText(txnCurrency)}}
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </td>
+    </table>
+  </div>
+  <div style="width:100%;text-align:center">
+    <img src="assets/imgs/pci-dss-logo.png" class="pci-logo">
+  </div>
+</div>
+<!-- OTP Screen Code-->
+<div class="content" *ngIf="pageStatus==3">
+  <div id="container" class="otp-card">
+    <mat-toolbar>
+      <span class="ib_font" color="primary">{{'OTP_VERIFICATION' | translate}}</span>
+      <span class="toolbar-spacer"></span>
+      <button mat-icon-button color="primary" (click)="cancelPayment()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-toolbar>
+    <div class="center">
+      <div class="input-box">
+        <form (ngSubmit)="verifyOtpForm()">
+          <mat-form-field appearance="standard" class="otp-field">
+            <input matInput autofocus type="password" inputmode="tel"  [(ngModel)]="otp"
+              placeholder="{{'ENTER_OTP' | translate}}" maxlength="6" *ngIf="!showOtp" appBlockCopyPaste numbersOnly class="password-field"
+              name="otp" />
+            <input matInput type="text" autofocus class="ion-text-center" [(ngModel)]="otp" name="otp"
+              placeholder="{{'ENTER_OTP' | translate}}" maxlength="6" *ngIf="showOtp" />
+            <button type="button" matSuffix mat-icon-button color="primary" (click)="changeView(showOtp)">
+              <mat-icon *ngIf="!showOtp">visibility</mat-icon>
+              <mat-icon *ngIf="showOtp">visibility_off</mat-icon>
+            </button>
+          </mat-form-field>
+          <div class="text-right">
+            <button type="button" *ngIf="!(walletType==='lmm' || walletType==='umoney')" mat-button color="primary" fill="clear" [disabled]="otpTimer>0" (click)="resendOtp()">
+              {{'RESEND_OTP' | translate}} <span *ngIf="otpTimer>0">: {{otpTimerLabel}} {{'SEC' | translate}}</span>
+            </button>
+          </div>
+          <div style="padding:10px">
+            <mat-grid-list cols="2" rowHeight="40px">
+              <mat-grid-tile>
+                <button type="button" mat-stroked-button color="warn" (click)="cancelPayment()"
+                  class="full-btn">{{'DISMISS' | translate}}</button>
+              </mat-grid-tile>
+              <mat-grid-tile>
+                <button type="submit" [disabled]="!otp || otp.length<6" mat-flat-button color="primary"
+                  class="full-btn">{{'PROCEED' | translate}}</button>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!--OTP Screen Code ended-->
+<!--Result Screen Code-->
+<div class="content payment-selection" *ngIf="pageStatus==4">
+  <div class="result-container">
+    <div *ngIf="txnStatus==='S'">
+      <div class="success-checkmark">
+        <div class="check-icon">
+          <span class="icon-line line-tip"></span>
+          <span class="icon-line line-long"></span>
+          <div class="icon-circle"></div>
+          <div class="ic  on-fix"></div>
+        </div>
+      </div>
+      <h3 class="success-txn">{{'TXN_SUCCESS' | translate}}</h3>
+    </div>
+    <div *ngIf="txnStatus!=='S'">
+      <div class="sa">
+        <div class="sa-error">
+          <div class="sa-error-x">
+            <div class="sa-error-left"></div>
+            <div class="sa-error-right"></div>
+          </div>
+          <div class="sa-error-placeholder"></div>
+          <div class="sa-error-fix"></div>
+        </div>
+      </div>
+      <h3 class="failed-txn">{{'TXN_FAILED' | translate}}</h3>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="result-contents">
+      <mat-list>
+        <mat-list-item>
+          <div style="display:flex; flex-direction:column">
+            <p matLine class="label">{{'TXN_NO' | translate}} </p>
+            <h2 matLine class="value"> {{txnResp.txnrefno}} </h2>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <div style="display:flex; flex-direction:column">
+            <p matLine class="label">{{'CUSTOMER_ID' | translate}} </p>
+            <p matLine class="value"> {{txnResp.customerId}} </p>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <div style="display:flex; flex-direction:column">
+            <p matLine class="label">{{'MERCHANT_REF_NO' | translate}} </p>
+            <p matLine class="value"> {{txnResp.merchrefno}} </p>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <div style="display:flex; flex-direction:column">
+            <p matLine class="label">{{'TXN_DESC' | translate}} </p>
+            <p matLine class="value"> {{txnResp.statusMsg}} </p>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <div style="display:flex; flex-direction:column">
+            <p matLine class="label">{{'TXN_AMOUNT' | translate}} </p>
+            <p matLine class="value"> {{txnResp.ccyCode}} {{txnResp.amount}} </p>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        <mat-list-item>
+          <div style="display:flex; flex-direction:column">
+            <p matLine class="label">{{'TXN_DATE_TIME' | translate}} </p>
+            <p matLine class="value"> {{txnResp.txndatetime}} </p>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </mat-list>
+      <div class="text-center">
+        <p matLine class="label">{{'TXN_WAITING_MSG' | translate}} </p>
+        <br>
+        <button mat-flat-button color="primary" (click)="redirectUrl()" *ngIf="txnResp.paymentMode==='ON'">
+          {{'REDIRECT_NOW' | translate}}
+        </button>
+        <button mat-stroked-button color="primary" (click)="download()" *ngIf="txnResp.paymentMode==='OFF'"
+          class="download-btn">
+          <img [src]="global.getImagePath('download-icon.png')" style="height: 20px"> &nbsp;
+          {{'DOWNLOAD_RECEIPT' | translate}}
+        </button>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<mat-toolbar color="primary">
+    <span class="ib_font" style="color:#fff">{{'ACC_DETAILS' | translate}}</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button mat-dialog-close>
+        <mat-icon>close</mat-icon>
+    </button>
+</mat-toolbar>
+<div class="center">
+    <div class="subheader">
+        <p class="label">{{'CNF_ACC_DETAILS_MSG'| translate}}</p>
+    </div>
+</div>
+<div class="contents">
+    <div class="item">
+        <p class="label">{{'CUSTOMER_NAME' | translate}}</p>
+        <h2 class="value">{{params.customerName}}</h2>
+    </div>
+    <div class="item">
+        <p class="label">{{'ACCOUNT_NUM' | translate}}</p>
+        <h2 class="value">{{global.maskAccount(params.accNo)}}</h2>
+    </div>
+    <div class="item">
+        <p class="label">{{'MOBILE_NUM' | translate}}</p>
+        <h2 class="value">{{global.maskMobile(params.mobileNo)}}</h2>
+    </div>
+    <div class="item">
+        <p class="label">{{'DATE_OF_BIRTH' | translate}}</p>
+        <h2 class="value">{{params.dob}}</h2>
+    </div>
+</div>
+<div style="padding-top:10px;padding-bottom:10px">
+    <mat-grid-list cols="2" rowHeight="40px">
+        <mat-grid-tile>
+            <button mat-stroked-button mat-dialog-close color="warn" (click)="close('N')"
+                class="full-btn">{{'DISMISS' | translate}}</button>
+        </mat-grid-tile>
+        <mat-grid-tile>
+            <button mat-flat-button mat-dialog-close color="primary" (click)="close('Y')"
+                class="full-btn">{{'PROCEED' | translate}}</button>
+        </mat-grid-tile>
+    </mat-grid-list>
+</div>

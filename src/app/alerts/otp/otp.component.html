@@ -1,0 +1,40 @@
+<mat-toolbar>
+    <span class="ib_font" color="primary">{{'OTP_VERIFICATION' | translate}}</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button mat-dialog-close color="primary">
+        <mat-icon>close</mat-icon>
+    </button>
+</mat-toolbar>
+<div class="center">
+    <div class="input-box">
+        <form (ngSubmit)="verifyForm()">
+            <mat-form-field appearance="standard" class="otp-field">
+                <input matInput autofocus type="password" inputmode="tel" [(ngModel)]="otp" placeholder="{{'ENTER_OTP' | translate}}"
+                    maxlength="6" *ngIf="!showOtp" class="password-field" name="otp" />
+                <input matInput type="text" autofocus class="ion-text-center" [(ngModel)]="otp" name="otp"
+                    placeholder="{{'ENTER_OTP' | translate}}" maxlength="6" *ngIf="showOtp" />
+                <button type="button" matSuffix mat-icon-button color="primary" (click)="changeView(showOtp)">
+                    <mat-icon *ngIf="!showOtp">visibility</mat-icon>
+                    <mat-icon *ngIf="showOtp">visibility_off</mat-icon>
+                </button>
+            </mat-form-field>
+            <div class="text-right">
+                <button mat-button color="primary" fill="clear" [disabled]="timer>0" (click)="resendOtp()">
+                    {{'RESEND_OTP' | translate}} <span *ngIf="timer>0">: {{timerLabel}} {{'SEC' | translate}}</span>
+                </button>
+            </div>
+            <div style="padding:10px">
+                <mat-grid-list cols="2" rowHeight="40px">
+                    <mat-grid-tile>
+                        <button type="button" mat-stroked-button mat-dialog-close color="warn" (click)="close('N')"
+                            class="full-btn">{{'DISMISS' | translate}}</button>
+                    </mat-grid-tile>
+                    <mat-grid-tile>
+                        <button type="submit" [disabled]="!otp || otp.length<6" mat-flat-button
+                            color="primary" class="full-btn">{{'PROCEED' | translate}}</button>
+                    </mat-grid-tile>
+                </mat-grid-list>
+            </div>
+        </form>
+    </div>
+</div>

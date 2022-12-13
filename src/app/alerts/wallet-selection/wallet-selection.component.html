@@ -1,0 +1,43 @@
+<mat-toolbar>
+    <span class="ib_font" color="primary">{{'WALLET_TYPE' | translate}}</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button mat-dialog-close color="primary">
+        <mat-icon>close</mat-icon>
+    </button>
+</mat-toolbar>
+<div class="center">
+    <div class="input-box">
+        <mat-selection-list #wallet [multiple]="false" [(ngModel)]="selectedWallet">
+            <mat-list-option *ngFor="let w of walletList"  [value]="w">
+                <mat-icon mat-list-icon class="icon-button">
+                    <img [src]="w.walletLogo" class="icon">
+                </mat-icon>
+                <div mat-line class="label">{{'WALLET_TYPE' | translate}}</div>
+                <div mat-line class="ib_font">{{w.walletName}} </div>
+                <mat-divider></mat-divider>
+            </mat-list-option>
+        </mat-selection-list>
+        <!-- <mat-list>
+            <mat-list-item *ngFor="let w of walletList">
+                <mat-icon mat-list-icon class="icon-button">
+                    <img [src]="w.walletLogo" class="icon">
+                </mat-icon>
+                <div mat-line class="label">{{'WALLET_TYPE' | translate}}</div>
+                <div mat-line class="ib_font">{{w.walletName}} </div>
+                <mat-divider></mat-divider>
+            </mat-list-item>
+        </mat-list> -->
+        <div style="padding:10px">
+            <mat-grid-list cols="2" rowHeight="40px">
+                <mat-grid-tile>
+                    <button type="button" mat-stroked-button mat-dialog-close color="warn"
+                        class="full-btn">{{'DISMISS' | translate}}</button>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                    <button type="submit" mat-flat-button color="primary" class="full-btn" (click)="close(selectedWallet)">
+                        {{'PROCEED' | translate}}</button>
+                </mat-grid-tile>
+            </mat-grid-list>
+        </div>
+    </div>
+</div>
